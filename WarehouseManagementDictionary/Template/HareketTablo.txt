@@ -1,0 +1,126 @@
+﻿using System;
+using System.Text;
+using System.Linq;
+using DevExpress.Xpo;
+using System.ComponentModel;
+using DevExpress.ExpressApp;
+using DevExpress.ExpressApp.DC;
+using System.Xml.Serialization;
+using DevExpress.Data.Filtering;
+using System.Collections.Generic;
+using DevExpress.ExpressApp.Model;
+
+namespace #namespace#
+{
+    [NonPersistent]
+    public class HareketTablo : XPObject, IHareketTablo
+    {
+        public HareketTablo() { }
+        public HareketTablo(Session session) : base(session) { }
+
+        [Size(400)]
+        [Persistent("description")]
+        public string Description { get; set; }
+
+        [Size(400)]
+        [Persistent("description2")]
+        public string Description2 { get; set; }
+
+        [Size(200)]
+        [Persistent("device_no")]
+        public string DeviceNo { get; set; }
+
+        [Size(200)]
+        [Persistent("device_id")]
+        public string DeviceId { get; set; }
+
+        [Size(200)]
+        [Persistent("source_app")]
+        public string SourceApp { get; set; }
+
+        [Persistent("source_device")]
+        public int SourcePlatform { get; set; }
+
+        [Persistent("reference_id")]
+        public int ReferenceId { get; set; }
+
+        [XmlIgnore()]
+        [Persistent("create_user_id")]
+        public int CreateUserId { get; set; }
+
+        protected DateTime fCreateDate;
+        [XmlIgnore()]
+        [Persistent("create_date")]
+        public DateTime CreateDate
+        {
+            get { return fCreateDate; }
+            set { SetPropertyValue<DateTime>("CreateDate", ref fCreateDate, value); }
+        }
+
+        [XmlIgnore()]
+        [ReadOnly(true)]
+        [Persistent("update_user_id")]
+        public int UpdateUserId  { get; set; }
+
+        protected DateTime fUpdateDate;
+        [XmlIgnore()]
+        [ReadOnly(true)]
+        [Persistent("update_date")]
+        public DateTime UpdateDate
+        {
+            get { return fUpdateDate; }
+            set { SetPropertyValue<DateTime>("UpdateDate", ref fUpdateDate, value); }
+        }
+
+        protected int fStatus = 0;
+        [Indexed]
+        [Persistent("status")]
+        public RecordStatus Status
+        {
+            get { return fStatus; }
+            set { SetPropertyValue<int>("Status", ref fStatus, value); }
+        }
+
+        #region Operators
+        public static implicit operator bool(HareketTablo tbl)
+        {
+            return (tbl != null && tbl.Status == 0);
+        }
+        public static explicit operator string(HareketTablo tbl)
+        {
+            return (tbl != null) ? tbl.Description : "";
+        }
+        #endregion
+
+        protected override void OnSaving()
+        {
+            if (!IsDeleted)
+            {
+                if (this.Session.IsNewObject(this))
+                {
+                    this.CreateDate = DateTime.Now;
+
+                    if (string.IsNullOrEmpty(this.DeviceNo))
+                        this.DeviceNo = Environment.MachineName;
+
+                    if (string.IsNullOrEmpty(this.DeviceId))
+                        this.DeviceId = Environment.UserName;
+
+                    //if (CreateUser.IsNull() && SecuritySystem.CurrentUser.IsNotNull())
+                    //{
+                    //    this.CreateUser = this.Session.GetObjectByKey<User>(((User)SecuritySystem.CurrentUser).Oid);
+                    //}
+                }
+                else
+                {
+                    this.UpdateDate = DateTime.Now;
+                    //if (UpdateUser.IsNull() && SecuritySystem.CurrentUser.IsNotNull())
+                    //{
+                    //    this.UpdateUser = this.Session.GetObjectByKey<User>(((User)SecuritySystem.CurrentUser).Oid);
+                    //}
+                }
+            }
+            base.OnSaving();
+        }
+    }
+}

@@ -1,0 +1,45 @@
+﻿using System;
+using System.Linq;
+using System.Text;
+using DevExpress.Xpo;
+using System.ComponentModel;
+using DevExpress.ExpressApp;
+using DevExpress.ExpressApp.DC;
+using System.Xml.Serialization;
+using DevExpress.Data.Filtering;
+using System.Collections.Generic;
+using DevExpress.ExpressApp.Model;
+using DevExpress.Persistent.Base;
+
+namespace #namespace#
+{
+    [NonPersistent]
+    public class KartTablo : XPBaseObject, IKartTablo
+    {
+        public KartTablo() { }
+        public KartTablo(Session session) : base(session) { }
+
+        [Size(400)]
+        [Persistent("description")]
+        public string Description { get; set; }
+
+        protected DateTime fUpdateDate;
+        [XmlIgnore()]
+        [ReadOnly(true)]
+        [Persistent("update_date")]
+        public DateTime UpdateDate
+        {
+            get { return fUpdateDate; }
+            set { SetPropertyValue<DateTime>("UpdateDate", ref fUpdateDate, value); }
+        }
+
+    }
+
+    [Serializable]
+    public abstract class KartInfo
+    {
+        public KartInfo() { }
+
+        public string Description { get; set; }
+    }
+}
